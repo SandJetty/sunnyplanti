@@ -10,10 +10,10 @@
 >
 > 스마트폰 카메라로 실제 햇빛(조도)을 측정하여 가상의 반려 식물을 키우는 **게이미피케이션(Gamification) 힐링 앱**입니다.
 <div align="center">
-  <img src="assets/images/home_screenshot.png" width="200" alt="Main Screen">
-  <img src="assets/images/camera_auth_screenshot.png" width="200" alt="Camera Screen">
-  <img src="assets/images/codex_screenshot.png" width="200" alt="Codex Screen">
-  <img src="assets/images/shop_screenshot.png" width="200" alt="Shop Screen">
+  <img src="assets/images/home_screenshot.PNG" width="200" alt="Main Screen">
+  <img src="assets/images/camera_auth_screenshot.PNG" width="200" alt="Camera Screen">
+  <img src="assets/images/codex_screenshot.PNG" width="200" alt="Codex Screen">
+  <img src="assets/images/shop_screenshot.PNG" width="200" alt="Shop Screen">
 </div>
 
 ---
