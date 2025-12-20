@@ -17,7 +17,6 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
   Timer? _timer;
   int _remainingSeconds = 0;
 
-  // 보상을 받을 준비가 되었는지 체크하는 변수
   bool _isRewardReady = false;
 
   @override
@@ -40,7 +39,6 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
   // 매일 처음 켰을 때 독려 메시지 띄우기
   void _checkDailyGreeting() {
     int questCount = DatabaseService.getQuestCount();
-    // 퀘스트가 0개라는 건 새로운 하루가 시작되었다는 뜻 (혹은 리셋 직후)
     if (questCount == 0 && _remainingSeconds == 0 && !_isRewardReady) {
       showDialog(
         context: context,
@@ -58,9 +56,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
     }
   }
 
-  // 저장된 타이머 확인 및 복구 (타입 오류 방지 코드 추가됨)
   void _checkSavedTimer() {
-    // DB에서 값을 가져올 때 타입이 다를 수 있어서 안전하게 처리
     dynamic savedTime = DatabaseService.getTimerEndTime();
 
     if (savedTime != null) {
@@ -148,14 +144,14 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
     });
   }
 
-  // 사용자가 '보상 받기' 버튼을 눌렀을 때 실행되는 진짜 보상 지급 함수
+  // 사용자가 '보상 받기' 버튼을 눌렀을 때 실행되는 보상 지급 함수
   Future<void> _claimReward() async {
     // DB 업데이트
     await DatabaseService.completeQuest();
     await DatabaseService.clearTimer(); // 타이머 정보 삭제
 
     setState(() {
-      _isRewardReady = false; // 보상 받았으니 버튼 숨김
+      _isRewardReady = false;
       _remainingSeconds = 0;
     });
 
@@ -165,7 +161,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
       await DatabaseService.unlockFlower(todayFlower);
 
       if (mounted) {
-        // 축하 다이얼로그 (중요하니까 팝업으로!)
+        // 축하 다이얼로그
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -181,7 +177,6 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
         );
       }
     } else {
-      // 일반 성장 메시지
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -194,11 +189,11 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
   }
 
   void _startTimer() async {
-    // 타이머 (개발중 10초로 설정해둠)
-    DateTime endTime = DateTime.now().add(const Duration(seconds: 10)); // 10분
+    // 타이머
+    DateTime endTime = DateTime.now().add(const Duration(minutes: 10)); // 10분
     await DatabaseService.setTimerEndTime(endTime);
     setState(() {
-      _remainingSeconds = 10;
+      _remainingSeconds = 600;
     });
     _runTimerLogic();
   }
@@ -232,7 +227,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
     int level = _getPlantLevel();
     String equippedPot = DatabaseService.getEquippedPot();
 
-    // 1. 화분 이미지 설정
+    // 화분 이미지 설정
     String potImageName;
     if (equippedPot == 'default') {
       potImageName = 'pot_basic.png';
@@ -242,9 +237,9 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
           : 'pot_$equippedPot.png';
     }
 
-    // 2. 식물 이미지 및 높이 조절
+    // 식물 이미지 및 높이 조절
     String? plantImageName;
-    double bottomPadding = 0; // 'Positioned' 좌표 대신 'Padding' 높이로 사용
+    double bottomPadding = 0;
 
     switch (level) {
       case 1: // 새싹
@@ -319,25 +314,25 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
             ],
           ),
         ),
-        centerTitle: true, // 타이틀 가운데 정렬
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          // 개발용 리셋 버튼
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () async {
-              await DatabaseService.resetData();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("🔄 데이터가 초기화되었습니다.")),
-                );
-                _checkDailyGreeting();
-              }
-              setState(() {});
-            },
-          ),
-        ],
+        // actions: [
+        //   // 개발용 리셋 버튼
+        //   IconButton(
+        //     icon: const Icon(Icons.refresh, color: Colors.white),
+        //     onPressed: () async {
+        //       await DatabaseService.resetData();
+        //       if (mounted) {
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           const SnackBar(content: Text("🔄 데이터가 초기화되었습니다.")),
+        //         );
+        //         _checkDailyGreeting();
+        //       }
+        //       setState(() {});
+        //     },
+        //   ),
+        // ],
       ),
 
       body: Container(
@@ -354,13 +349,13 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 1. 도감 & 상점 버튼 (화면 상단 양쪽에 배치)
+              // 도감 & 상점 버튼
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10), // 위쪽 여백 조절
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // [왼쪽] 도감 버튼
+                    // 도감 버튼
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -387,7 +382,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
                       ),
                     ),
 
-                    // [오른쪽] 상점(포인트) 버튼
+                    // 상점 버튼
                     GestureDetector(
                       onTap: () async {
                         await Navigator.push(
@@ -434,7 +429,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
                       ? "Lv.2 쑥쑥 자란 봉오리" // 2단계
                       : _getPlantLevel() == 1
                       ? "Lv.1 파릇파릇한 새싹" // 1단계
-                      : "Lv.0 잠자고 있는 씨앗", // 0단계 (나머지)
+                      : "Lv.0 잠자고 있는 씨앗", // 0단계
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -445,17 +440,17 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
 
               const Spacer(),
               const SizedBox(height: 30),
-              // 2. 식물 캐릭터
+              // 식물 캐릭터
               _buildPlantCharacter(),
 
               const SizedBox(height: 15),
 
-              // 4. 퀘스트 카드
+              // 퀘스트 카드
               Container(
                 padding: const EdgeInsets.all(20),
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8), // 투명도 살짝 조절
+                  color: Colors.white.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -527,10 +522,10 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
                       height: 50,
                       child: _isRewardReady
                           ? ElevatedButton(
-                              // [CASE 1] 보상 받기 버튼
-                              onPressed: _claimReward, // 버튼 누르면 보상 지급
+                              // 보상 받기 버튼
+                              onPressed: _claimReward,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueAccent, // 눈에 띄게 파란색
+                                backgroundColor: Colors.blueAccent,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
@@ -545,7 +540,7 @@ class _MainGardenScreenState extends State<MainGardenScreen> {
                               ),
                             )
                           : ElevatedButton(
-                              // [CASE 2] 산책 시작 버튼 (기존)
+                              // 산책 시작 버튼
                               onPressed:
                                   questCount >= 3 || _remainingSeconds > 0
                                   ? null

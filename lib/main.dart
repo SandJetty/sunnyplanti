@@ -29,10 +29,10 @@ class MyApp extends StatelessWidget {
       title: 'Sunny Planti',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        scaffoldBackgroundColor: const Color(0xFFF5F9F5), // 연한 연두색 배경
+        scaffoldBackgroundColor: const Color(0xFFF5F9F5),
         useMaterial3: true,
       ),
-      home: const MainGardenScreen(), // 홈 화면으로 시작!
+      home: const MainGardenScreen(),
     );
   }
 }

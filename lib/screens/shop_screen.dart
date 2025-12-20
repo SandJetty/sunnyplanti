@@ -9,15 +9,13 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
-  // 판매할 아이템 목록
   final List<Map<String, dynamic>> items = [
-    // --- 기존 판매중인 화분 4개 ---
     {
       'id': 'default',
       'name': '기본 화분',
       'price': 0,
       'image': 'assets/images/pot_basic.png',
-      'isComingSoon': false, // 판매중
+      'isComingSoon': false,
     },
     {
       'id': 'white',
@@ -123,7 +121,6 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 상단 패딩 (상태바 + 앱바 + 여유)
     final double topPadding =
         MediaQuery.of(context).padding.top + kToolbarHeight + 20;
 
@@ -155,7 +152,6 @@ class _ShopScreenState extends State<ShopScreen> {
       ),
       body: Stack(
         children: [
-          // 1. 배경 이미지
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -165,7 +161,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-          // 2. 아이템 그리드
+          // 아이템 그리드
           GridView.builder(
             padding: EdgeInsets.only(
               top: topPadding,
@@ -186,7 +182,6 @@ class _ShopScreenState extends State<ShopScreen> {
               // 상태 확인
               bool isOwned = ownedItems.contains(item['id']);
               bool isEquipped = equippedItem == item['id'];
-              // [추가] 미공개 여부 확인 (null safety를 위해 기본값 false)
               bool isComingSoon = item['isComingSoon'] ?? false;
 
               return Container(
@@ -207,10 +202,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // [변경] 미공개면 아이콘, 아니면 이미지
                     if (isComingSoon)
                       const Icon(
-                        Icons.lock_outline_rounded, // 자물쇠 아이콘
+                        Icons.lock_outline_rounded,
                         size: 60,
                         color: Colors.grey,
                       )
@@ -224,29 +218,25 @@ class _ShopScreenState extends State<ShopScreen> {
 
                     const SizedBox(height: 10),
 
-                    // 이름 (Coming Soon)
                     Text(
                       item['name'],
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: isComingSoon
-                            ? Colors.grey
-                            : Colors.black, // 미공개는 회색 글씨
+                        color: isComingSoon ? Colors.grey : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 5),
 
                     // 버튼 분기 처리
                     if (isComingSoon)
-                      // [추가] 미공개용 비활성화 버튼
                       ElevatedButton(
-                        onPressed: null, // null을 주면 버튼이 비활성화(회색)됨
+                        onPressed: null, // 버튼 비활성화
                         style: ElevatedButton.styleFrom(
-                          disabledBackgroundColor: Colors.grey[300], // 비활성화 배경색
-                          disabledForegroundColor: Colors.grey[600], // 비활성화 글자색
+                          disabledBackgroundColor: Colors.grey[300],
+                          disabledForegroundColor: Colors.grey[600],
                         ),
-                        child: Text("${item['price']} P"), // 가격은 보여줌
+                        child: Text("${item['price']} P"),
                       )
                     else if (isEquipped)
                       const Text(
